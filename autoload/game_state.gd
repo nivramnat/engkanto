@@ -1,29 +1,69 @@
 extends Node
-## Global game state (autoload): the player's party and battle orchestration.
+## Global game state (autoload): the player's party, inventory, storage, and
+## battle orchestration.
 ##
 ## Battles run as an overlay that pauses the overworld, so returning drops the
 ## player back exactly where they were.
 
-var party: Array[CreatureInstance] = []
-var _in_battle: bool = false
-
 const BATTLE_SCENE: PackedScene = preload("res://scenes/battle/battle.tscn")
 const STARTER_PATH: String = "res://data/creatures/duwende.tres"
+const ANTING_ANTING: String = "anting-anting"
+const MAX_PARTY: int = 6
+
+var party: Array[CreatureInstance] = []
+var storage: Array[CreatureInstance] = []  ## the Albularyo's Hut (party overflow)
+var inventory: Dictionary = {}
+var _in_battle: bool = false
 
 
 func _ready() -> void:
 	var starter: Creature = load(STARTER_PATH)
 	if starter != null:
 		party.append(CreatureInstance.create(starter, 5))
+	inventory[ANTING_ANTING] = 10
 
 
-## First party member that can still fight, or null if the party is wiped.
+func is_in_battle() -> bool:
+	return _in_battle
+
+
+# --- Inventory ---
+
+func item_count(item: String) -> int:
+	return inventory.get(item, 0)
+
+
+func add_item(item: String, amount: int = 1) -> void:
+	inventory[item] = item_count(item) + amount
+
+
+func use_item(item: String) -> bool:
+	if item_count(item) <= 0:
+		return false
+	inventory[item] -= 1
+	return true
+
+
+# --- Party / storage ---
+
 func first_able() -> CreatureInstance:
 	for c in party:
 		if not c.is_fainted():
 			return c
 	return null
 
+
+## Add a bound creature to the party, or to storage if the party is full.
+## Returns "party" or "storage".
+func capture(creature: CreatureInstance) -> String:
+	if party.size() < MAX_PARTY:
+		party.append(creature)
+		return "party"
+	storage.append(creature)
+	return "storage"
+
+
+# --- Battle ---
 
 func start_battle(wild: CreatureInstance, wild_node: Node = null) -> void:
 	if _in_battle:

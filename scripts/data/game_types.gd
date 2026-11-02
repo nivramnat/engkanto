@@ -8,6 +8,11 @@ enum Element { NEUTRAL, EARTH, FIRE, WATER, WIND, DARK, LIGHT, BLOOD }
 enum SpawnTime { DAY, NIGHT, BOTH }
 
 
+## Human-readable element name, e.g. Element.EARTH -> "Earth".
+static func element_name(element: Element) -> String:
+	return String(Element.keys()[element]).capitalize()
+
+
 ## Placeholder tint used to tell elements apart until real art exists.
 static func element_color(element: Element) -> Color:
 	match element:

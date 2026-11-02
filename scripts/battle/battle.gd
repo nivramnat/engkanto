@@ -23,8 +23,10 @@ var _busy: bool = false
 @onready var _action_menu: Control = %ActionMenu
 @onready var _move_menu: Control = %MoveMenu
 @onready var _fight_button: Button = %FightButton
+@onready var _bind_button: Button = %BindButton
 @onready var _run_button: Button = %RunButton
 @onready var _back_button: Button = %BackButton
+@onready var _amulet: ColorRect = %Amulet
 
 var _move_buttons: Array[Button] = []
 
@@ -32,12 +34,14 @@ var _move_buttons: Array[Button] = []
 func _ready() -> void:
 	_move_buttons = [%Move0, %Move1, %Move2, %Move3]
 	_fight_button.pressed.connect(_on_fight_pressed)
+	_bind_button.pressed.connect(_on_bind_pressed)
 	_run_button.pressed.connect(_on_run_pressed)
 	_back_button.pressed.connect(_show_action_menu)
 	for i in _move_buttons.size():
 		_move_buttons[i].pressed.connect(_on_move_pressed.bind(i))
 	_action_menu.hide()
 	_move_menu.hide()
+	_amulet.hide()
 
 
 func setup(p_player: CreatureInstance, p_wild: CreatureInstance) -> void:
@@ -71,6 +75,9 @@ func _refresh() -> void:
 func _show_action_menu() -> void:
 	_move_menu.hide()
 	_action_menu.show()
+	var antings: int = GameState.item_count(GameState.ANTING_ANTING)
+	_bind_button.text = "Bind (%d)" % antings
+	_bind_button.disabled = antings <= 0
 	_message.text = "What will %s do?" % player.display_name()
 
 
@@ -100,6 +107,62 @@ func _on_run_pressed() -> void:
 	_action_menu.hide()
 	await _say("Got away safely!")
 	finished.emit("run")
+
+
+func _on_bind_pressed() -> void:
+	if _busy or GameState.item_count(GameState.ANTING_ANTING) <= 0:
+		return
+	_busy = true
+	_action_menu.hide()
+	await _attempt_bind()
+	_busy = false
+
+
+func _attempt_bind() -> void:
+	GameState.use_item(GameState.ANTING_ANTING)
+	await _say("You hurl an anting-anting at %s!" % wild.display_name())
+
+	# catch_rate is on a 0-255 scale; weaker targets are easier to bind.
+	var ritual_bonus: float = 1.0  # folklore rituals will adjust this later
+	var hp_ratio: float = float(wild.current_hp) / float(maxi(1, wild.max_hp()))
+	var chance: float = clampf((wild.data.catch_rate / 255.0) * (1.0 - hp_ratio) * ritual_bonus, 0.0, 1.0)
+	var success: bool = randf() < chance
+	var shakes: int = 3 if success else randi_range(1, 3)
+	await _play_bind_animation(shakes)
+
+	if success:
+		wild.full_heal()
+		var where: String = GameState.capture(wild)
+		await _say("Gotcha! %s was bound!" % wild.display_name())
+		if where == "storage":
+			await _say("Your party is full — %s was sent to the Albularyo's Hut." % wild.display_name())
+		finished.emit("caught")
+		return
+
+	await _say("Aww! It broke free!")
+	await _do_attack(wild, player, _enemy_move())
+	if await _check_end():
+		return
+	_show_action_menu()
+
+
+func _play_bind_animation(shakes: int) -> void:
+	_amulet.pivot_offset = _amulet.size * 0.5
+	_amulet.rotation = 0.0
+	_amulet.show()
+	for i in shakes:
+		var t := create_tween()
+		# Shake...
+		t.tween_property(_amulet, "rotation", deg_to_rad(18.0), 0.08)
+		t.tween_property(_amulet, "rotation", deg_to_rad(-18.0), 0.16)
+		t.tween_property(_amulet, "rotation", 0.0, 0.08)
+		# ...while glowing (runs alongside the shake).
+		t.parallel().tween_property(_amulet, "modulate", Color(1.4, 1.3, 0.7), 0.16)
+		t.parallel().tween_property(_amulet, "modulate", Color(1.0, 1.0, 1.0), 0.16).set_delay(0.16)
+		await t.finished
+		await get_tree().create_timer(0.12, true).timeout
+	_amulet.hide()
+	_amulet.rotation = 0.0
 
 
 func _on_move_pressed(index: int) -> void:

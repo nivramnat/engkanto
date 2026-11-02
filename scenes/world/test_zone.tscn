@@ -1,4 +1,4 @@
-[gd_scene load_steps=26 format=3]
+[gd_scene load_steps=27 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="1"]
 [ext_resource type="Script" path="res://scripts/world/test_zone.gd" id="2"]
@@ -19,6 +19,7 @@
 [ext_resource type="PackedScene" path="res://assets/models/nature/glTF/Grass_Common_Short.gltf" id="17"]
 [ext_resource type="PackedScene" path="res://assets/models/nature/glTF/Grass_Wispy_Tall.gltf" id="18"]
 [ext_resource type="PackedScene" path="res://assets/models/nature/glTF/Flower_4_Single.gltf" id="19"]
+[ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="20"]
 
 [sub_resource type="ProceduralSkyMaterial" id="SkyMat"]
 sky_top_color = Color(0.3, 0.55, 0.85, 1)
@@ -113,6 +114,8 @@ rng_seed = 33
 
 [node name="Player" parent="." instance=ExtResource("1")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 10)
+
+[node name="HUD" parent="." instance=ExtResource("20")]
 
 [node name="SpawnZone" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -6)
