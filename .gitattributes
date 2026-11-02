@@ -1,2 +1,10 @@
 # Normalize EOL for all files that Git considers text files.
 * text=auto eol=lf
+# Native plugin binaries and generated/binary data — never EOL-normalize.
+*.dll binary
+*.so binary
+*.dylib binary
+*.wasm binary
+*.res binary
+*.exr binary
+*.bin binary

@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Engkanto"
-run/main_scene="res://scenes/world/test_zone.tscn"
+run/main_scene="res://scenes/world/world.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.svg"
 
@@ -20,6 +20,10 @@ config/icon="res://icon.svg"
 GameState="*res://autoload/game_state.gd"
 SaveManager="*res://autoload/save_manager.gd"
 TimeOfDay="*res://autoload/time_of_day.gd"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/terrain_3d/plugin.cfg")
 
 [display]
 

@@ -11,6 +11,7 @@ class_name SpawnZone
 @export var max_alive: int = 5
 @export var spawn_radius: float = 12.0
 @export var spawn_interval: float = 1.5
+@export var active_radius: float = 0.0  ## only spawn when the player is within this (0 = always)
 
 var _alive: Array[Node] = []
 var _timer: float = 0.0
@@ -22,10 +23,30 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	_prune()
+	if not _player_in_range():
+		# Unload this biome's creatures while the player is away (streaming).
+		for n in _alive:
+			if is_instance_valid(n):
+				n.queue_free()
+		_alive.clear()
+		return
 	_timer -= delta
 	if _timer <= 0.0:
 		_timer = spawn_interval
 		_try_spawn()
+
+
+func _player_in_range() -> bool:
+	if active_radius <= 0.0:
+		return true
+	var p := get_tree().get_first_node_in_group("player")
+	if p == null:
+		return false
+	# Horizontal distance only — biomes are laid out in XZ and the player's Y
+	# follows the terrain.
+	var a := Vector2(global_position.x, global_position.z)
+	var b := Vector2(p.global_position.x, p.global_position.z)
+	return a.distance_to(b) <= active_radius
 
 
 func _try_spawn() -> void:
