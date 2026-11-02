@@ -91,7 +91,8 @@ func _flat_distance_to(point: Vector3) -> float:
 
 
 func _on_body_entered(body: Node) -> void:
-	if body.is_in_group("player"):
-		var creature_name: String = creature_data.name if creature_data != null else "???"
-		print("Encountered wild %s!" % creature_name)
+	if body.is_in_group("player") and creature_data != null:
+		print("Encountered wild %s!" % creature_data.name)
 		touched.emit(creature_data)
+		var wild := CreatureInstance.create(creature_data, randi_range(3, 6))
+		GameState.start_battle(wild, self)
