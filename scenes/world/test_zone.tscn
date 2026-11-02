@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3]
+[gd_scene load_steps=26 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="1"]
 [ext_resource type="Script" path="res://scripts/world/test_zone.gd" id="2"]
@@ -7,27 +7,43 @@
 [ext_resource type="Resource" path="res://data/creatures/duwende.tres" id="5"]
 [ext_resource type="Resource" path="res://data/creatures/tiyanak.tres" id="6"]
 [ext_resource type="Resource" path="res://data/creatures/kapre.tres" id="7"]
+[ext_resource type="Script" path="res://scripts/world/scenery.gd" id="8"]
+[ext_resource type="Script" path="res://scripts/world/multimesh_scatter.gd" id="9"]
+[ext_resource type="PackedScene" path="res://scenes/world/props/tree_common.tscn" id="10"]
+[ext_resource type="PackedScene" path="res://scenes/world/props/pine.tscn" id="11"]
+[ext_resource type="PackedScene" path="res://scenes/world/props/dead_tree.tscn" id="12"]
+[ext_resource type="PackedScene" path="res://scenes/world/props/rock.tscn" id="13"]
+[ext_resource type="PackedScene" path="res://scenes/world/props/balete_tree.tscn" id="14"]
+[ext_resource type="PackedScene" path="res://assets/models/nature/glTF/Bush_Common.gltf" id="15"]
+[ext_resource type="PackedScene" path="res://assets/models/nature/glTF/Bush_Common_Flowers.gltf" id="16"]
+[ext_resource type="PackedScene" path="res://assets/models/nature/glTF/Grass_Common_Short.gltf" id="17"]
+[ext_resource type="PackedScene" path="res://assets/models/nature/glTF/Grass_Wispy_Tall.gltf" id="18"]
+[ext_resource type="PackedScene" path="res://assets/models/nature/glTF/Flower_4_Single.gltf" id="19"]
+
+[sub_resource type="ProceduralSkyMaterial" id="SkyMat"]
+sky_top_color = Color(0.3, 0.55, 0.85, 1)
+sky_horizon_color = Color(0.95, 0.82, 0.62, 1)
+ground_bottom_color = Color(0.55, 0.5, 0.42, 1)
+ground_horizon_color = Color(0.95, 0.82, 0.62, 1)
+
+[sub_resource type="Sky" id="SkyRes"]
+sky_material = SubResource("SkyMat")
 
 [sub_resource type="Environment" id="Environment_1"]
-background_mode = 1
-background_color = Color(0.46, 0.58, 0.69, 1)
-ambient_light_color = Color(0.5, 0.5, 0.55, 1)
-ambient_light_energy = 0.6
+background_mode = 2
+sky = SubResource("SkyRes")
+ambient_light_source = 2
+ambient_light_color = Color(0.85, 0.84, 0.78, 1)
+ambient_light_energy = 0.5
 
 [sub_resource type="BoxShape3D" id="GroundShape"]
-size = Vector3(40, 1, 40)
+size = Vector3(80, 1, 80)
 
 [sub_resource type="BoxMesh" id="GroundMesh"]
-size = Vector3(40, 1, 40)
-
-[sub_resource type="BoxShape3D" id="BoxShape"]
-size = Vector3(1, 1, 1)
-
-[sub_resource type="BoxMesh" id="BoxMesh"]
-size = Vector3(1, 1, 1)
+size = Vector3(80, 1, 80)
 
 [sub_resource type="StandardMaterial3D" id="GroundMat"]
-albedo_color = Color(0.3, 0.45, 0.3, 1)
+albedo_color = Color(0.28, 0.46, 0.24, 1)
 
 [node name="TestZone" type="Node3D"]
 script = ExtResource("2")
@@ -49,44 +65,54 @@ shape = SubResource("GroundShape")
 mesh = SubResource("GroundMesh")
 surface_material_override/0 = SubResource("GroundMat")
 
-[node name="Obstacle1" type="StaticBody3D" parent="."]
-transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 4, 1, -3)
+[node name="BaleteTree" parent="." instance=ExtResource("14")]
+transform = Transform3D(1.2, 0, 0, 0, 1.2, 0, 0, 0, 1.2, 0, 0, 0)
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Obstacle1"]
-shape = SubResource("BoxShape")
+[node name="Scenery" type="Node3D" parent="."]
+script = ExtResource("8")
+tree_scenes = Array[PackedScene]([ExtResource("10"), ExtResource("11"), ExtResource("12")])
+rock_scenes = Array[PackedScene]([ExtResource("13")])
+bush_scenes = Array[PackedScene]([ExtResource("15"), ExtResource("16")])
+area_extent = 38.0
+clear_radius = 15.0
+tree_count = 22
+rock_count = 16
+bush_count = 20
+cluster_count = 5
+rng_seed = 20251102
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Obstacle1"]
-mesh = SubResource("BoxMesh")
+[node name="GrassMM" type="MultiMeshInstance3D" parent="."]
+script = ExtResource("9")
+source_scene = ExtResource("17")
+count = 500
+area_extent = 38.0
+clear_radius = 14.0
+min_scale = 0.6
+max_scale = 1.0
+rng_seed = 11
 
-[node name="Obstacle2" type="StaticBody3D" parent="."]
-transform = Transform3D(1.5, 0, 0, 0, 3, 0, 0, 0, 1.5, -3, 1.5, -5)
+[node name="GrassWispyMM" type="MultiMeshInstance3D" parent="."]
+script = ExtResource("9")
+source_scene = ExtResource("18")
+count = 250
+area_extent = 38.0
+clear_radius = 14.0
+min_scale = 0.6
+max_scale = 1.1
+rng_seed = 22
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Obstacle2"]
-shape = SubResource("BoxShape")
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Obstacle2"]
-mesh = SubResource("BoxMesh")
-
-[node name="Obstacle3" type="StaticBody3D" parent="."]
-transform = Transform3D(3, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -8)
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Obstacle3"]
-shape = SubResource("BoxShape")
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Obstacle3"]
-mesh = SubResource("BoxMesh")
-
-[node name="Obstacle4" type="StaticBody3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 4, 0, 0, 0, 1, -6, 2, -2)
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Obstacle4"]
-shape = SubResource("BoxShape")
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Obstacle4"]
-mesh = SubResource("BoxMesh")
+[node name="FlowerMM" type="MultiMeshInstance3D" parent="."]
+script = ExtResource("9")
+source_scene = ExtResource("19")
+count = 120
+area_extent = 38.0
+clear_radius = 14.0
+min_scale = 0.7
+max_scale = 1.2
+rng_seed = 33
 
 [node name="Player" parent="." instance=ExtResource("1")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 10)
 
 [node name="SpawnZone" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -6)

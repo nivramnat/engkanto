@@ -16,8 +16,8 @@ func _on_phase_changed(is_night: bool) -> void:
 
 
 func _apply(is_night: bool) -> void:
+	# Background is a sky, so drive night via the sun and ambient energy.
 	_sun.light_energy = 0.15 if is_night else 1.0
 	var env: Environment = _world_env.environment
 	if env != null:
-		env.background_color = Color(0.05, 0.06, 0.12) if is_night else Color(0.46, 0.58, 0.69)
-		env.ambient_light_energy = 0.2 if is_night else 0.6
+		env.ambient_light_energy = 0.2 if is_night else 0.5
