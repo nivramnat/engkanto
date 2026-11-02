@@ -8,6 +8,8 @@ extends CharacterBody3D
 
 @export var walk_speed: float = 4.0
 @export var run_speed: float = 7.0
+@export var jump_velocity: float = 5.0
+@export var air_acceleration: float = 12.0    ## how fast air movement responds (lower = less control)
 @export var turn_speed: float = 12.0          ## how fast the body faces its movement direction
 @export var mouse_sensitivity: float = 0.005  ## radians of camera rotation per pixel of mouse motion
 @export var touch_sensitivity: float = 0.004  ## radians of camera rotation per pixel of swipe
@@ -17,6 +19,7 @@ extends CharacterBody3D
 var _gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity", 9.8)
 var _joystick_input: Vector2 = Vector2.ZERO
 var _pending_swipe: Vector2 = Vector2.ZERO    ## touch rotation accumulated between physics frames
+var _jump_requested: bool = false             ## set by the on-screen jump button for one physics frame
 
 @onready var _camera_yaw: Node3D = $CameraYaw
 @onready var _spring_arm: SpringArm3D = $CameraYaw/SpringArm3D
@@ -33,6 +36,9 @@ func _ready() -> void:
 	var swipe_area := get_node_or_null("TouchControls/CameraTouchArea")
 	if swipe_area != null:
 		swipe_area.swiped.connect(_on_camera_swiped)
+	var jump_button := get_node_or_null("TouchControls/JumpButton")
+	if jump_button != null:
+		jump_button.pressed.connect(_on_jump_button_pressed)
 
 
 func _on_joystick_direction_changed(direction: Vector2) -> void:
@@ -41,6 +47,10 @@ func _on_joystick_direction_changed(direction: Vector2) -> void:
 
 func _on_camera_swiped(relative: Vector2) -> void:
 	_pending_swipe += relative * touch_sensitivity
+
+
+func _on_jump_button_pressed() -> void:
+	_jump_requested = true
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -59,8 +69,14 @@ func _physics_process(delta: float) -> void:
 		_rotate_camera(-_pending_swipe.x, -_pending_swipe.y)
 		_pending_swipe = Vector2.ZERO
 
-	if not is_on_floor():
+	var on_floor: bool = is_on_floor()
+	if not on_floor:
 		velocity.y -= _gravity * delta
+
+	# Jump only from the floor; the button request lasts a single frame.
+	if (Input.is_action_just_pressed("jump") or _jump_requested) and on_floor:
+		velocity.y = jump_velocity
+	_jump_requested = false
 
 	# Keyboard/gamepad plus the touch joystick, clamped to a unit length.
 	var move_input: Vector2 = Input.get_vector("move_left", "move_right", "move_forward", "move_back")
@@ -75,8 +91,16 @@ func _physics_process(delta: float) -> void:
 		direction = Vector3.ZERO
 
 	var speed: float = run_speed if Input.is_action_pressed("run") else walk_speed
-	velocity.x = direction.x * speed
-	velocity.z = direction.z * speed
+	var target_x: float = direction.x * speed
+	var target_z: float = direction.z * speed
+	if on_floor:
+		# Snappy, fully-responsive ground control.
+		velocity.x = target_x
+		velocity.z = target_z
+	else:
+		# Reduced air control so movement eases rather than snaps mid-jump.
+		velocity.x = move_toward(velocity.x, target_x, air_acceleration * delta)
+		velocity.z = move_toward(velocity.z, target_z, air_acceleration * delta)
 
 	if direction.length() > 0.001:
 		var target_yaw: float = atan2(direction.x, direction.z)

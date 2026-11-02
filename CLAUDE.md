@@ -9,6 +9,14 @@ Open world monster-catching game based on Filipino folklore. The player is an ap
 - Style: low-poly 3D, third-person camera
 - Godot CLI available on PATH as `godot_console` (use `--headless --import` to validate changes)
 
+## Input Actions
+Defined in project.godot; aim for both PC and touch bindings per the coding rules.
+- move_forward / move_back / move_left / move_right — WASD + arrow keys (PC); on-screen joystick, bottom-left (touch)
+- run — Shift (PC)
+- jump — Spacebar (PC); on-screen button, bottom-right (touch)
+- interact — E + left mouse (PC)
+- camera_rotate — right-mouse drag + Q (PC); swipe on right half of screen (touch)
+
 ## Core Loop
 Explore region > encounter creature > weaken or appease > bind > train > unlock next area
 
