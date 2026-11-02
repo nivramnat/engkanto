@@ -3,10 +3,11 @@
 Open world monster-catching game based on Filipino folklore. The player is an apprentice babaylan who binds and befriends engkanto (mythical creatures) to restore balance between the human and spirit worlds.
 
 ## Platform and Engine
-- Godot 4.x (latest stable), GDScript only (no C#)
+- Godot 4.7 (stable), GDScript only (no C#)
 - Targets: Android and PC (Windows)
-- Renderer: Mobile (for Android performance)
+- Renderer: GL Compatibility (chosen for low-end Android support)
 - Style: low-poly 3D, third-person camera
+- Godot CLI available on PATH as `godot_console` (use `--headless --import` to validate changes)
 
 ## Core Loop
 Explore region > encounter creature > weaken or appease > bind > train > unlock next area
