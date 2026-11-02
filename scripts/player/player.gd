@@ -27,6 +27,8 @@ var _jump_requested: bool = false             ## set by the on-screen jump butto
 
 
 func _ready() -> void:
+	add_to_group("player")
+
 	# Keep the spring arm from colliding with the player's own body.
 	_spring_arm.add_excluded_object(get_rid())
 
