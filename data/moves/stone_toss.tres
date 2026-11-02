@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="Move" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/move.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+name = "Stone Toss"
+element_type = 1
+power = 40
+accuracy = 100
+description = "Hurls a chunk of packed earth dug from a punso mound."

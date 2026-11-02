@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="Creature" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/creature.gd" id="1"]
+[ext_resource type="Resource" path="res://data/moves/stone_toss.tres" id="2"]
+[ext_resource type="Resource" path="res://data/moves/hex_mutter.tres" id="3"]
+
+[resource]
+script = ExtResource("1")
+name = "Duwende"
+folklore_origin = "Philippine lowland folklore (nuno sa punso)"
+element_type = 1
+hp = 45
+attack = 40
+defense = 55
+speed = 60
+moves = Array[Move]([ExtResource("2"), ExtResource("3")])
+catch_rate = 190
+spawn_time = 2
+lore_text = "Tiny earth-dwelling spirits that make their homes in anthills and mounds. Kind to those who show respect, and spiteful to those who do not."

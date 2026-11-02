@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="Creature" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/creature.gd" id="1"]
+[ext_resource type="Resource" path="res://data/moves/tabako_smoke.tres" id="2"]
+[ext_resource type="Resource" path="res://data/moves/branch_slam.tres" id="3"]
+
+[resource]
+script = ExtResource("1")
+name = "Kapre"
+folklore_origin = "Philippine folklore"
+element_type = 1
+hp = 85
+attack = 72
+defense = 68
+speed = 30
+moves = Array[Move]([ExtResource("2"), ExtResource("3")])
+catch_rate = 45
+spawn_time = 2
+lore_text = "A towering, dark giant said to dwell in old balete and mango trees, forever puffing on a giant cigar."
