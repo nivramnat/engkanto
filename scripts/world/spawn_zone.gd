@@ -74,10 +74,13 @@ func _random_point() -> Vector3:
 
 
 func _prune() -> void:
-	_alive = _alive.filter(func(n: Node) -> bool: return is_instance_valid(n))
+	# Untyped parameter on purpose: freed objects can't convert to Node, and a
+	# typed lambda would error instead of filtering them out.
+	_alive = _alive.filter(func(n: Variant) -> bool: return is_instance_valid(n))
 
 
 func _on_phase_changed(_is_night: bool) -> void:
+	_prune()  # drop freed creatures before casting
 	for n in _alive:
 		var wild := n as WildCreature
 		if is_instance_valid(wild) and wild.creature_data != null:

@@ -13,7 +13,11 @@ signal touched(creature: Creature)
 @export var stop_distance: float = 3.0
 @export var turn_speed: float = 8.0
 
+const ENCOUNTER_COOLDOWN: float = 2.0  ## seconds after a run/loss before it can trigger again
+
 var creature_data: Creature
+var _battle_wild: CreatureInstance  ## set while a battle against this creature is open
+var _encounter_cooldown: float = 0.0
 var _home: Vector3
 var _target: Vector3
 var _idle_timer: float = 0.0
@@ -42,6 +46,8 @@ func setup(data: Creature) -> void:
 
 
 func _physics_process(delta: float) -> void:
+	if _encounter_cooldown > 0.0:
+		_encounter_cooldown -= delta
 	if not is_on_floor():
 		velocity.y -= _gravity * delta
 	else:
@@ -91,8 +97,26 @@ func _flat_distance_to(point: Vector3) -> float:
 
 
 func _on_body_entered(body: Node) -> void:
-	if body.is_in_group("player") and creature_data != null:
-		print("Encountered wild %s!" % creature_data.name)
-		touched.emit(creature_data)
-		var wild := CreatureInstance.create(creature_data, randi_range(3, 6))
-		GameState.start_battle(wild, self)
+	if not body.is_in_group("player") or creature_data == null:
+		return
+	if _battle_wild != null or _encounter_cooldown > 0.0:
+		return
+	var wild := CreatureInstance.create(creature_data, randi_range(3, 6))
+	if not GameState.start_battle(wild):
+		return
+	print("Encountered wild %s!" % creature_data.name)
+	_battle_wild = wild
+	GameState.battle_finished.connect(_on_battle_finished)
+	touched.emit(creature_data)
+
+
+func _on_battle_finished(result: String, wild: CreatureInstance) -> void:
+	if wild != _battle_wild:
+		return
+	GameState.battle_finished.disconnect(_on_battle_finished)
+	_battle_wild = null
+	if result == "win" or result == "caught":
+		queue_free()  # defeated or bound: gone from the overworld
+	else:
+		# Ran or lost: stay, but give the player a moment to walk away.
+		_encounter_cooldown = ENCOUNTER_COOLDOWN

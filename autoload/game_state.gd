@@ -5,6 +5,10 @@ extends Node
 ## Battles run as an overlay that pauses the overworld, so returning drops the
 ## player back exactly where they were.
 
+## Emitted after a battle closes and the tree is unpaused. result is "win",
+## "lose", "run" or "caught"; wild is the creature that was fought.
+signal battle_finished(result: String, wild: CreatureInstance)
+
 const BATTLE_SCENE: PackedScene = preload("res://scenes/battle/battle.tscn")
 const STARTER_PATH: String = "res://data/creatures/duwende.tres"
 const ANTING_ANTING: String = "anting-anting"
@@ -65,27 +69,27 @@ func capture(creature: CreatureInstance) -> String:
 
 # --- Battle ---
 
-func start_battle(wild: CreatureInstance, wild_node: Node = null) -> void:
-	if _in_battle:
-		return
+## Start a battle against `wild`. Returns false if one couldn't start (already
+## in battle, or no able party creature). The overworld isn't touched here:
+## whoever started the battle listens for battle_finished and reacts to it.
+func start_battle(wild: CreatureInstance) -> bool:
+	if _in_battle or wild == null:
+		return false
 	var player_creature := first_able()
 	if player_creature == null:
-		return
+		return false
 	_in_battle = true
-
-	# Remove the wild creature from the overworld so it can't retrigger.
-	if wild_node != null and is_instance_valid(wild_node):
-		wild_node.queue_free()
 
 	var battle := BATTLE_SCENE.instantiate()
 	battle.process_mode = Node.PROCESS_MODE_ALWAYS  # keep running while the tree is paused
 	get_tree().root.add_child(battle)
-	battle.finished.connect(_on_battle_finished.bind(battle, player_creature))
+	battle.finished.connect(_on_battle_finished.bind(battle, player_creature, wild), CONNECT_ONE_SHOT)
 	battle.setup(player_creature, wild)
 	get_tree().paused = true
+	return true
 
 
-func _on_battle_finished(_result: String, battle: Node, player_creature: CreatureInstance) -> void:
+func _on_battle_finished(result: String, battle: Node, player_creature: CreatureInstance, wild: CreatureInstance) -> void:
 	get_tree().paused = false
 	if is_instance_valid(battle):
 		battle.queue_free()
@@ -94,3 +98,4 @@ func _on_battle_finished(_result: String, battle: Node, player_creature: Creatur
 		for c in party:
 			c.full_heal()
 	_in_battle = false
+	battle_finished.emit(result, wild)
