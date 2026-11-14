@@ -132,7 +132,7 @@ func _phase_load() -> void:
 
 	# Bad creature path is skipped, rest of the save still loads.
 	var data: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(SAVE))
-	data["game"]["storage"].append({"resource": "res://data/creatures/nope.tres", "level": 3, "current_hp": 5})
+	data["game"]["storage"].append({"resource": "res://data/creatures/nope.tres", "level": 3, "current_hp": 5})  # path-case: ignore (missing on purpose)
 	_write_json(SAVE, data)
 	_check(SaveManager.load_game() and GameState.storage.size() == 2, "unknown creature skipped, save still loads")
 

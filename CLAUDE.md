@@ -49,6 +49,7 @@ Explore region > encounter creature > weaken or appease > bind > train > unlock 
 - res://data/moves/   Move resources (.tres)
 - res://assets/models/, res://assets/textures/, res://assets/audio/
 - res://autoload/     Global singletons (GameState, SaveManager, TimeOfDay)
+- res://tools/        Dev scripts run from the CLI (not part of the game)
 
 ## Coding Rules
 - Use static typing in all GDScript (var hp: int = 0)
@@ -56,7 +57,8 @@ Explore region > encounter creature > weaken or appease > bind > train > unlock 
 - One script per scene; keep scripts under 300 lines, split if larger
 - Use signals for communication between systems, not direct node paths across scenes
 - Every input action must work with both touch (Android) and keyboard/mouse (PC)
-- All asset folder and file names must be lowercase (snake_case) for Android compatibility: exported builds are case-sensitive, so a path that only differs in case works on Windows but breaks on Android
+- New asset folders and files use lowercase (snake_case) names. Existing assets keep their current names (e.g. the Quaternius `glTF/` pack); don't rename them
+- Every path reference must match the file's exact case: Android is case-sensitive, Windows is not, so a wrong-case path works in the editor but breaks on a phone. Check with `godot_console --headless --path . -s res://tools/check_path_case.gd` (must print `PATH CASE: OK`)
 - Commit to git after each working system with a clear message
 
 ## Workflow
