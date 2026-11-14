@@ -27,6 +27,7 @@ Defined in project.godot; aim for both PC and touch bindings per the coding rule
 Run each and check for `RESULT: PASS` (they use their own save files, never the real one):
 - `godot_console --path . res://tests/battle_flow_test.tscn` — win / run / bind return to the overworld
 - `godot_console --path . res://tests/save_load_test.tscn -- --phase=save`, then `-- --phase=load` — save, quit, Continue, edge cases
+- `godot_console --path . res://tests/hut_test.tscn -- --phase=save`, then `-- --phase=load` — hut prompt, moving both ways (Move button + mouse drag), last-creature/full-party blocks, Heal All, autosave on close
 
 ## Core Loop
 Explore region > encounter creature > weaken or appease > bind > train > unlock next area
@@ -65,5 +66,5 @@ Explore region > encounter creature > weaken or appease > bind > train > unlock 
 ## Current Status
 - [x] Step 1: Project setup (this file, folders, git, input map)
 - [x] Steps 2–6: player, Terrain3D open world (4 biomes), day/night spawning, encounters, battle, binding
-- [~] Step 7: party (6 max) + storage overflow done; Albularyo's Hut UI not built yet
+- [x] Step 7: party (6 max) + Albularyo's Hut (Baryo Lowlands, near the balete): move party/storage, Heal All, autosave on close
 - [x] Step 8: Save/load (title screen, pause menu, autosave, versioned JSON)

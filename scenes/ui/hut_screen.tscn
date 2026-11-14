@@ -1,0 +1,288 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/hut_screen.gd" id="1"]
+
+[sub_resource type="StyleBoxFlat" id="PanelStyle"]
+bg_color = Color(0.11, 0.13, 0.12, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.93, 0.85, 0.55, 0.6)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="ColumnStyle"]
+content_margin_left = 10.0
+content_margin_top = 8.0
+content_margin_right = 10.0
+content_margin_bottom = 10.0
+bg_color = Color(0.17, 0.19, 0.17, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="BadgeStyle"]
+content_margin_left = 10.0
+content_margin_top = 2.0
+content_margin_right = 10.0
+content_margin_bottom = 2.0
+bg_color = Color(0.55, 0.55, 0.55, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="HPBg"]
+bg_color = Color(0, 0, 0, 0.45)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="HPFill"]
+bg_color = Color(0.36, 0.78, 0.4, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="HutScreen" type="Control"]
+process_mode = 3
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 0
+script = ExtResource("1")
+
+[node name="Dim" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0, 0, 0, 0.6)
+
+[node name="Panel" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = 12.0
+offset_right = -12.0
+offset_bottom = -12.0
+theme_override_styles/panel = SubResource("PanelStyle")
+
+[node name="Margin" type="MarginContainer" parent="Panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 14
+
+[node name="VBox" type="VBoxContainer" parent="Panel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="TopBar" type="HBoxContainer" parent="Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="Panel/Margin/VBox/TopBar"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "Albularyo's Hut"
+
+[node name="Status" type="Label" parent="Panel/Margin/VBox/TopBar"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.95, 0.85, 0.55, 1)
+theme_override_font_sizes/font_size = 19
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="HealButton" type="Button" parent="Panel/Margin/VBox/TopBar"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(180, 72)
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 26
+text = "Heal All"
+
+[node name="CloseButton" type="Button" parent="Panel/Margin/VBox/TopBar"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(150, 72)
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 26
+text = "Close"
+
+[node name="Columns" type="HBoxContainer" parent="Panel/Margin/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 12
+
+[node name="PartyBox" type="PanelContainer" parent="Panel/Margin/VBox/Columns"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 0
+theme_override_styles/panel = SubResource("ColumnStyle")
+
+[node name="VBox" type="VBoxContainer" parent="Panel/Margin/VBox/Columns/PartyBox"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 6
+
+[node name="PartyHeader" type="Label" parent="Panel/Margin/VBox/Columns/PartyBox/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Party"
+
+[node name="Scroll" type="ScrollContainer" parent="Panel/Margin/VBox/Columns/PartyBox/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 1
+horizontal_scroll_mode = 0
+
+[node name="PartyList" type="VBoxContainer" parent="Panel/Margin/VBox/Columns/PartyBox/VBox/Scroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/separation = 6
+
+[node name="DetailsBox" type="PanelContainer" parent="Panel/Margin/VBox/Columns"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 1.15
+theme_override_styles/panel = SubResource("ColumnStyle")
+
+[node name="VBox" type="VBoxContainer" parent="Panel/Margin/VBox/Columns/DetailsBox"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="DetailName" type="Label" parent="Panel/Margin/VBox/Columns/DetailsBox/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text_overrun_behavior = 3
+
+[node name="InfoRow" type="HBoxContainer" parent="Panel/Margin/VBox/Columns/DetailsBox/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Level" type="Label" parent="Panel/Margin/VBox/Columns/DetailsBox/VBox/InfoRow"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+
+[node name="ElementBadge" type="PanelContainer" parent="Panel/Margin/VBox/Columns/DetailsBox/VBox/InfoRow"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_styles/panel = SubResource("BadgeStyle")
+
+[node name="Element" type="Label" parent="Panel/Margin/VBox/Columns/DetailsBox/VBox/InfoRow/ElementBadge"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+
+[node name="HPLabel" type="Label" parent="Panel/Margin/VBox/Columns/DetailsBox/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+
+[node name="HPBar" type="ProgressBar" parent="Panel/Margin/VBox/Columns/DetailsBox/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 14)
+layout_mode = 2
+theme_override_styles/background = SubResource("HPBg")
+theme_override_styles/fill = SubResource("HPFill")
+show_percentage = false
+
+[node name="Origin" type="Label" parent="Panel/Margin/VBox/Columns/DetailsBox/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.75, 0.75, 0.7, 1)
+theme_override_font_sizes/font_size = 16
+autowrap_mode = 3
+
+[node name="LoreScroll" type="ScrollContainer" parent="Panel/Margin/VBox/Columns/DetailsBox/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="Lore" type="Label" parent="Panel/Margin/VBox/Columns/DetailsBox/VBox/LoreScroll"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 19
+autowrap_mode = 3
+
+[node name="MoveHint" type="Label" parent="Panel/Margin/VBox/Columns/DetailsBox/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.7, 0.5, 1)
+theme_override_font_sizes/font_size = 16
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="MoveButton" type="Button" parent="Panel/Margin/VBox/Columns/DetailsBox/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 72)
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 24
+text = "Move"
+
+[node name="StorageBox" type="PanelContainer" parent="Panel/Margin/VBox/Columns"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 0
+theme_override_styles/panel = SubResource("ColumnStyle")
+
+[node name="VBox" type="VBoxContainer" parent="Panel/Margin/VBox/Columns/StorageBox"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 6
+
+[node name="StorageHeader" type="Label" parent="Panel/Margin/VBox/Columns/StorageBox/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Storage"
+
+[node name="StorageScroll" type="ScrollContainer" parent="Panel/Margin/VBox/Columns/StorageBox/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 1
+horizontal_scroll_mode = 0
+
+[node name="StorageGrid" type="GridContainer" parent="Panel/Margin/VBox/Columns/StorageBox/VBox/StorageScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/h_separation = 6
+theme_override_constants/v_separation = 6
+columns = 2
+
+[node name="StorageEmpty" type="Label" parent="Panel/Margin/VBox/Columns/StorageBox/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.65, 1)
+theme_override_font_sizes/font_size = 18
+text = "No creatures resting here. Drag one here, or select it and tap Move."
+autowrap_mode = 3

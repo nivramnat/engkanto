@@ -8,6 +8,8 @@ extends Node
 ## Emitted after a battle closes and the tree is unpaused. result is "win",
 ## "lose", "run" or "caught"; wild is the creature that was fought.
 signal battle_finished(result: String, wild: CreatureInstance)
+## Emitted when party/storage contents or party HP change outside battle.
+signal party_changed
 
 const BATTLE_SCENE: PackedScene = preload("res://scenes/battle/battle.tscn")
 const STARTER_PATH: String = "res://data/creatures/duwende.tres"
@@ -72,6 +74,42 @@ func capture(creature: CreatureInstance) -> String:
 		return "party"
 	storage.append(creature)
 	return "storage"
+
+
+## Why `creature` can't move to the other side right now ("" if it can). The
+## party may never be emptied, and may never grow past MAX_PARTY.
+func move_blocked_reason(creature: CreatureInstance) -> String:
+	if creature in party:
+		if party.size() <= 1:
+			return "Your last party creature has to stay with you."
+		return ""
+	if creature in storage:
+		if party.size() >= MAX_PARTY:
+			return "Your party is full (%d). Move one to storage first." % MAX_PARTY
+		return ""
+	return "That creature isn't yours."
+
+
+## Move a creature between party and storage (whichever side it is on).
+## Returns false, changing nothing, when move_blocked_reason() says no.
+func move_creature(creature: CreatureInstance) -> bool:
+	if move_blocked_reason(creature) != "":
+		return false
+	if creature in party:
+		party.erase(creature)
+		storage.append(creature)
+	else:
+		storage.erase(creature)
+		party.append(creature)
+	party_changed.emit()
+	return true
+
+
+## Restore every party creature to full HP (the hut's Heal All).
+func heal_party() -> void:
+	for c in party:
+		c.full_heal()
+	party_changed.emit()
 
 
 # --- Save data ---

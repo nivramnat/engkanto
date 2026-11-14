@@ -110,6 +110,8 @@ func _build_chunk(c: Vector2i) -> Node3D:
 		var y: float = _height(px, pz)
 		if y < 0.2:
 			continue  # don't plant trees in the water/beach
+		if _in_clear_zone(px, pz):
+			continue  # keep buildings (e.g. the Albularyo's Hut) free of trees
 		var inst: Node3D = (scenes[rng.randi() % scenes.size()] as PackedScene).instantiate()
 		node.add_child(inst)
 		var s: float = rng.randf_range(0.8, 1.25)
@@ -119,6 +121,16 @@ func _build_chunk(c: Vector2i) -> Node3D:
 
 	_build_grass(node, dom, dom_w, x0, z0, rng)
 	return node
+
+
+## True if (x, z) is inside a node in the "scatter_clear" group (it exports clear_radius).
+func _in_clear_zone(x: float, z: float) -> bool:
+	for n in get_tree().get_nodes_in_group("scatter_clear"):
+		var p: Vector3 = (n as Node3D).global_position
+		var r: float = float(n.get("clear_radius")) if n.get("clear_radius") != null else 6.0
+		if Vector2(p.x, p.z).distance_squared_to(Vector2(x, z)) < r * r:
+			return true
+	return false
 
 
 func _build_grass(node: Node3D, dom: int, dom_w: float, x0: float, z0: float, rng: RandomNumberGenerator) -> void:
