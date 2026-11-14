@@ -56,6 +56,7 @@ Explore region > encounter creature > weaken or appease > bind > train > unlock 
 - One script per scene; keep scripts under 300 lines, split if larger
 - Use signals for communication between systems, not direct node paths across scenes
 - Every input action must work with both touch (Android) and keyboard/mouse (PC)
+- All asset folder and file names must be lowercase (snake_case) for Android compatibility: exported builds are case-sensitive, so a path that only differs in case works on Windows but breaks on Android
 - Commit to git after each working system with a clear message
 
 ## Workflow
