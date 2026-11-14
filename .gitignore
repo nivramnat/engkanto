@@ -5,3 +5,7 @@
 # Temp files (e.g. Windows/Terrain3D DLL swap files)
 *.TMP
 *.tmp
+
+# OS metadata files
+desktop.ini
+Thumbs.db
