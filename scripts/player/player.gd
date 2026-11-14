@@ -28,6 +28,7 @@ var _jump_requested: bool = false             ## set by the on-screen jump butto
 
 func _ready() -> void:
 	add_to_group("player")
+	_restore_from_save()
 
 	# Keep the spring arm from colliding with the player's own body.
 	_spring_arm.add_excluded_object(get_rid())
@@ -41,6 +42,22 @@ func _ready() -> void:
 	var jump_button := get_node_or_null("TouchControls/JumpButton")
 	if jump_button != null:
 		jump_button.pressed.connect(_on_jump_button_pressed)
+
+
+## Place the player where the loaded save left them (no-op on a new game).
+func _restore_from_save() -> void:
+	var saved: Dictionary = SaveManager.take_pending_player()
+	var pos: Variant = saved.get("position")
+	if pos is Array and pos.size() == 3:
+		# Small lift so we settle onto the terrain even if its streamed
+		# collision appears a frame after we do.
+		global_position = Vector3(float(pos[0]), float(pos[1]) + 0.5, float(pos[2]))
+	if saved.has("camera_yaw"):
+		_camera_yaw.rotation.y = float(saved["camera_yaw"])
+
+
+func get_camera_yaw() -> float:
+	return _camera_yaw.rotation.y
 
 
 func _on_joystick_direction_changed(direction: Vector2) -> void:

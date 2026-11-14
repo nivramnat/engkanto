@@ -21,10 +21,17 @@ var _in_battle: bool = false
 
 
 func _ready() -> void:
+	new_game()  # sensible default so the world scene also runs on its own
+
+
+## Reset to a fresh game: the starter creature and a few anting-anting.
+func new_game() -> void:
+	party.clear()
+	storage.clear()
+	inventory = {ANTING_ANTING: 10}
 	var starter: Creature = load(STARTER_PATH)
 	if starter != null:
 		party.append(CreatureInstance.create(starter, 5))
-	inventory[ANTING_ANTING] = 10
 
 
 func is_in_battle() -> bool:
@@ -65,6 +72,41 @@ func capture(creature: CreatureInstance) -> String:
 		return "party"
 	storage.append(creature)
 	return "storage"
+
+
+# --- Save data ---
+
+func to_dict() -> Dictionary:
+	return {
+		"party": party.map(func(c: CreatureInstance) -> Dictionary: return c.to_dict()),
+		"storage": storage.map(func(c: CreatureInstance) -> Dictionary: return c.to_dict()),
+		"inventory": inventory.duplicate(),
+	}
+
+
+func from_dict(d: Dictionary) -> void:
+	party = _creatures_from(d.get("party", []))
+	storage = _creatures_from(d.get("storage", []))
+	# Overflow from an edited/old save goes to the hut rather than being lost.
+	while party.size() > MAX_PARTY:
+		storage.push_front(party.pop_back())
+	inventory = {}
+	var inv: Variant = d.get("inventory", {})
+	if inv is Dictionary:
+		for key in inv:
+			inventory[str(key)] = maxi(0, int(inv[key]))  # JSON numbers load as floats
+
+
+func _creatures_from(list: Variant) -> Array[CreatureInstance]:
+	var out: Array[CreatureInstance] = []
+	if not list is Array:
+		return out
+	for entry in list:
+		if entry is Dictionary:
+			var c := CreatureInstance.from_dict(entry)
+			if c != null:
+				out.append(c)
+	return out
 
 
 # --- Battle ---

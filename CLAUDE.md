@@ -16,6 +16,17 @@ Defined in project.godot; aim for both PC and touch bindings per the coding rule
 - jump — Spacebar (PC); on-screen button, bottom-right (touch)
 - interact — E + left mouse (PC)
 - camera_rotate — right-mouse drag + Q (PC); swipe on right half of screen (touch)
+- pause — Esc (PC); HUD Pause button and Android back button (touch). `quit_on_go_back` is off so back never quits mid-game
+
+## Save System
+- SaveManager writes JSON to user://save_game.json (atomic .tmp swap). Autosaves on every battle end (incl. bind); manual Save in the pause menu
+- Bump `SaveManager.SAVE_VERSION` and add a `_migrate()` step whenever the save format changes; never break old saves
+- Each class owns its data: `to_dict()` / `from_dict()` on GameState, TimeOfDay, CreatureInstance (creatures saved by .tres path)
+
+## Tests
+Run each and check for `RESULT: PASS` (they use their own save files, never the real one):
+- `godot_console --path . res://tests/battle_flow_test.tscn` — win / run / bind return to the overworld
+- `godot_console --path . res://tests/save_load_test.tscn -- --phase=save`, then `-- --phase=load` — save, quit, Continue, edge cases
 
 ## Core Loop
 Explore region > encounter creature > weaken or appease > bind > train > unlock next area
@@ -53,3 +64,6 @@ Explore region > encounter creature > weaken or appease > bind > train > unlock 
 
 ## Current Status
 - [x] Step 1: Project setup (this file, folders, git, input map)
+- [x] Steps 2–6: player, Terrain3D open world (4 biomes), day/night spawning, encounters, battle, binding
+- [~] Step 7: party (6 max) + storage overflow done; Albularyo's Hut UI not built yet
+- [x] Step 8: Save/load (title screen, pause menu, autosave, versioned JSON)

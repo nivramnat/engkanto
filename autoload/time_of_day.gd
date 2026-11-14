@@ -46,6 +46,21 @@ func toggle_phase() -> void:
 	_check_phase()
 
 
+func to_dict() -> Dictionary:
+	return {"time_hours": time_hours}
+
+
+func from_dict(d: Dictionary) -> void:
+	set_time(float(d.get("time_hours", 8.0)))
+
+
+## Set the clock without firing phase_changed (used by new game / load, before
+## the world exists).
+func set_time(hours: float) -> void:
+	time_hours = fposmod(hours, 24.0)
+	_was_night = is_night()
+
+
 func allows_spawn(spawn_time: GameTypes.SpawnTime) -> bool:
 	match spawn_time:
 		GameTypes.SpawnTime.DAY:

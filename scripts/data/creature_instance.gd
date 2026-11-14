@@ -47,3 +47,37 @@ func full_heal() -> void:
 
 func display_name() -> String:
 	return data.name if data != null else "???"
+
+
+# --- Save data ---
+
+## Plain-data form for the save file. Creature data is stored by resource path
+## so the .tres stays the single source of truth for stats and moves.
+func to_dict() -> Dictionary:
+	var d: Dictionary = {
+		"resource": data.resource_path if data != null else "",
+		"level": level,
+		"current_hp": current_hp,
+	}
+	var xp: Variant = get("xp")  # only saved once the XP system adds the field
+	if xp != null:
+		d["xp"] = xp
+	return d
+
+
+## Rebuild from to_dict() output. Returns null if the creature resource is
+## missing, so one bad entry doesn't break the whole save.
+static func from_dict(d: Dictionary) -> CreatureInstance:
+	var path: String = str(d.get("resource", ""))
+	if path == "" or not ResourceLoader.exists(path):
+		push_warning("Save: skipping creature with missing resource '%s'" % path)
+		return null
+	var res: Creature = load(path) as Creature
+	if res == null:
+		push_warning("Save: '%s' is not a Creature resource" % path)
+		return null
+	var inst := CreatureInstance.create(res, maxi(1, int(d.get("level", 1))))
+	inst.current_hp = clampi(int(d.get("current_hp", inst.max_hp())), 0, inst.max_hp())
+	if d.has("xp") and "xp" in inst:
+		inst.set("xp", int(d["xp"]))
+	return inst

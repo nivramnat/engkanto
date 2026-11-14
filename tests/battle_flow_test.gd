@@ -15,6 +15,9 @@ var _last_result: String = ""
 
 
 func _ready() -> void:
+	# Autosave fires after each battle; never touch the player's real save.
+	SaveManager.save_path = "user://test_battle_flow.json"
+	SaveManager.delete_save()
 	# Sibling of this node (not a child) so the world pauses normally.
 	_world = (load(WORLD) as PackedScene).instantiate()
 	get_tree().root.add_child.call_deferred(_world)
@@ -27,6 +30,7 @@ func _run() -> void:
 	await _frames(120)  # let terrain, scatter and spawners settle
 	for scenario in SCENARIOS:
 		await _encounter(scenario)
+	SaveManager.delete_save()
 	print("RESULT: %s (%d failure(s))" % ["PASS" if _failures == 0 else "FAIL", _failures])
 	get_tree().quit(1 if _failures > 0 else 0)
 

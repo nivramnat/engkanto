@@ -10,6 +10,7 @@ extends Node
 var _env: Environment
 var _sun: DirectionalLight3D
 var _player: Node3D
+var _first_frame: bool = true
 
 
 func _ready() -> void:
@@ -39,7 +40,9 @@ func _process(delta: float) -> void:
 		target_energy *= 0.3
 		target_fog = target_fog.darkened(0.6)
 
-	var t: float = clampf(lerp_speed * delta, 0.0, 1.0)
+	# First frame snaps, so a loaded game starts in its biome's mood.
+	var t: float = 1.0 if _first_frame else clampf(lerp_speed * delta, 0.0, 1.0)
+	_first_frame = false
 	if _env != null:
 		_env.fog_light_color = _env.fog_light_color.lerp(target_fog, t)
 		_env.fog_density = lerpf(_env.fog_density, target_density, t)
