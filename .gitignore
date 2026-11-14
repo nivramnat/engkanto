@@ -1,3 +1,7 @@
 # Godot 4+ specific ignores
 .godot/
 /android/
+
+# Temp files (e.g. Windows/Terrain3D DLL swap files)
+*.TMP
+*.tmp
