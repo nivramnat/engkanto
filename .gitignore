@@ -9,3 +9,6 @@
 # OS metadata files
 desktop.ini
 Thumbs.db
+
+# Asset pack preview images
+Preview_*.jpg*
